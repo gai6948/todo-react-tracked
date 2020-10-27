@@ -1,8 +1,9 @@
 import React from "react";
 
-import { useDispatch, useTrackedState } from "../store";
-import { useFlasher } from "../utils/useFlasher";
-import '../components/App.css';
+import { useQuery } from "../hooks/useQuery";
+import { useDeleteTodo } from "../hooks/useDeleteTodo";
+import { useToggleTodo } from "../hooks/useToggleTodo";
+import { useFlasher } from "../hooks/useFlasher";
 
 const renderHighlight = (title, query) => {
   if (!query) return title;
@@ -18,26 +19,24 @@ const renderHighlight = (title, query) => {
 };
 
 const TodoItem = ({ id, title, completed }) => {
-  const dispatch = useDispatch();
-  const state = useTrackedState();
-  const delTodo = () => {
-    dispatch({ type: "DELETE_TODO", id });
-  };
+  const { getQuery } = useQuery();
+  const deleteTodo = useDeleteTodo();
+  const toggleTodo = useToggleTodo();
   return (
     <li ref={useFlasher()}>
       <input
         type="checkbox"
         checked={!!completed}
-        onChange={() => dispatch({ type: "TOGGLE_TODO", id })}
+        onChange={() => toggleTodo(id)}
       />
       <span
         style={{
           textDecoration: completed ? "line-through" : "none",
         }}
       >
-        {completed ? title : renderHighlight(title, state.query)}
+        {completed ? title : renderHighlight(title, getQuery())}
       </span>
-      <button onClick={delTodo}>Delete</button>
+      <button onClick={() => deleteTodo(id)}>Delete</button>
     </li>
   );
 };
